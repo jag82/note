@@ -1,7 +1,13 @@
-function Note(stringOrObject, options) {
+function Note(arg1, options) {
 	options = options ||  { verbose: true }
 
-	var type = typeof stringOrObject;
+	var type = typeof arg1;
+
+	if(type === 'number'){
+		//this is a rest!
+		this.duration = arg1;
+		return;
+	}
 
 	var string;
 	if(type === 'object'){
@@ -11,12 +17,12 @@ function Note(stringOrObject, options) {
 				octave: Note.DEFAULT_DURATION,
 				duration: Note.DEFAULT_DURATION 
 			}, 
-			stringOrObject
+			arg1
 		);
 		string = object.letter + object.accidental + object.octave + '.' + object.duration;
 	}
 	else if(type === 'string') {
-		string = stringOrObject;
+		string = arg1;
 	}
 	else{
 		throw 'unsupported parameter type for constructor: ' + type; 
@@ -34,9 +40,6 @@ function Note(stringOrObject, options) {
 	this.duration = array[4] || Note.DEFAULT_DURATION;
 
 	//validate
-	if(this.octave > 12){
-		throw 'octave out of range: ' + this.octave;
-	}
 	if(this.duration <= 0){
 		throw 'duration out of range: ' + this.duration;
 	}
@@ -63,7 +66,8 @@ function Note(stringOrObject, options) {
 		index -= 12;
 	}
 
-	this.chromatic = index;
+	//chromatic is 1-12
+	this.chromatic = index + 1;
 	this.octave *= 1;
 	this.duration *= 1;
 }
@@ -71,6 +75,7 @@ function Note(stringOrObject, options) {
 
 //STATIC VARS
 //
+Note.REST_CHAR = '-';
 Note.SHARP_CHAR = '#';
 Note.FLAT_CHAR = 'b';
 Note.SHARP_SYMBOL = '♯';
@@ -78,6 +83,7 @@ Note.FLAT_SYMBOL = '♭';
 
 Note.DEFAULT_OCTAVE = 4;
 Note.DEFAULT_DURATION = 4;
+
 // Note.SCALE = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 Note.SCALE_SHARPS = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 Note.SCALE_FLATS = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
@@ -104,27 +110,110 @@ Note.SCALE_FLATS = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
 
 //STATIC METHODS
 //
-
+Note.createRest = function(duration){
+	return new Note(duration);
+}
 
 //GET METHODS
 //
+
+Note.prototype.isRest = function(){
+	return this.chromatic === undefined;
+}
+
+Note.prototype.isAccidental = function(){
+	return this.getSignature().length === 2;
+}
+
 //TODO: rename this method (what are Ab, C, D#, F## called?)
 Note.prototype.getSignature = function(options) {
 	options = options || {};
+	if(this.isRest()){
+		return Note.REST_CHAR;
+	}
 	if(options.asFlat){
-		return Note.SCALE_FLATS[this.chromatic];
+		return Note.SCALE_FLATS[this.chromatic-1];
 	}else{
-		return Note.SCALE_SHARPS[this.chromatic];
+		return Note.SCALE_SHARPS[this.chromatic-1];
 	}
 }
 
-
-//MODIFY METHODS
+// MODIFY PITCH
 //
 Note.prototype.raise = function(options){
-	this.octave++;
+	options = options || {};
+	if(this.isRest()){
+		return this;
+	}
+	var steps = options.steps || 1;
+	this.chromatic += steps;
+	while(this.chromatic > 12){
+		this.chromatic -= 12;
+		this.octave++;
+	}
 	return this;
 }
 
+Note.prototype.lower = function(options){
+	options = options || {};
+	if(this.isRest()){
+		return this;
+	}
+	var steps = options.steps || 1;
+	this.chromatic -= steps;
+	while(this.chromatic <= 0){
+		this.chromatic += 12;
+		this.octave--;
+	}
+	return this;
+}
+
+
+// MODIFY DURATION
+//
+Note.prototype.shorten = function(options){
+	options = options || {};
+	var steps = options.steps || 1;
+	var wholeSteps = Math.floor(steps / 2);
+	var halfStep = steps % 2 !== 0;
+	this.duration *= Math.pow(2, wholeSteps);
+	if(halfStep){
+		this.duration *= 1.5;
+	}
+	return this;
+}
+
+Note.prototype.lengthen = function(options){
+	options = options || {};
+	var steps = options.steps || 1;
+	var wholeSteps = Math.floor(steps / 2);
+	var halfStep = steps % 2 !== 0;
+	this.duration /= Math.pow(2, wholeSteps);
+	if(halfStep){
+		this.duration = (this.duration / 2)*1.5;
+	}
+	if(this.duration < 1){
+		this.duration = 1;
+	}
+	return this;
+}
+
+
+//TO STRING, TO OBJECT
+//
+Note.prototype.toString = function(options){
+	return this.getSignature(options) + this.octave + '.' + this.duration;
+}
+
+Note.prototype.toObject = function(options){
+	options = options || {};
+	var signature = this.getSignature(options);
+	return {
+		letter: signature[0],
+		accidental: signature[1] || '',
+		octave: this.octave,
+		duration: this.duration
+	}
+}
 
 module.exports = Note;

@@ -2,13 +2,19 @@
 
 ##TODO:
 
-- rests (see composer tests)
-- add modification functions
-- add convenience getters
+- set pitch, set duration (tests first, then implementation)
+
+- integrate into composer (add dot notation!)
+
 - add things like frequency: consider separate packages when you have a concrete example such as alternate tuning
-- autodocumentation?
+
+>> work on composer: playing multiple notes
+
+- docment: autodocumentation?
 - publish package
+
 - code coverage and other badges?
+
 - custom formats/mapping (e.g. new Note('Ab-6-12', 'N#-o-d'), new Note({ l: 'A'}, { length: 'l'}))
 
 

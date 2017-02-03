@@ -91,10 +91,6 @@ test('new note via object (with octaves)', function(t){
 		note = new Note({ letter: 'C', octave: -1 });
     }, 'throws if octave is too low');
 
-	t.throws(function(){
-		note = new Note({ letter: 'C', octave: 13 });
-    }, 'throws if octave is too high');
-
 	t.end();
 });
 
