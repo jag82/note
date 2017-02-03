@@ -4,7 +4,7 @@
   "description": "musical note as an object",
   "main": "note.js",
   "scripts": {
-    "test": "tape **/*.tests.js | tap-notify | faucet || true",
+    "test": "tape tests/**/*.tests.js | tap-notify | faucet || true",
     "test-watch": "chokidar-cmd -t **/*.js -c \"npm run test\""
   },
   "keywords": [
