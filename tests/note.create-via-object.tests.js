@@ -29,6 +29,28 @@ test('new note via object (with letters)', function(t){
 	t.end();
 });
 
+test('new note via object (with chromatic)', function(t){
+	var note;
+
+	note = new Note({chromatic: 1});
+	utils.assertNote(t, note, 'C', Note.DEFAULT_OCTAVE, Note.DEFAULT_DURATION, 'accepts a chromatic (lowest)');
+
+	note = new Note({chromatic: 12});
+	utils.assertNote(t, note, 'B', Note.DEFAULT_OCTAVE, Note.DEFAULT_DURATION, 'accepts a chromatic (highest)');
+
+		
+	t.throws(function(){
+		note = new Note({chromatic: 0});
+    }, 'throws if chromatic is not in scale');
+
+	t.throws(function(){
+		note = new Note({});
+    }, 'throws if chromatic is absent');
+
+	t.end();
+});
+
+
 test('new note via object (with accidentals)', function(t){
 	var note;
 

@@ -1,6 +1,6 @@
 var Note = require('./note.js');
 
-var n = new Note();
+var n = new Note('C4');
 n.raise();
 
 console.log(JSON.stringify(n));
