@@ -176,7 +176,10 @@ Note.getDistance = function(fromNote, toNote){
 //
 
 Note.isRest = function(note){
-	return note.chromatic === undefined;
+	return note.chromatic === undefined
+		|| note.chromatic === null
+		|| note.chromatic === false
+		|| note.chromatic === 0;
 }
 
 Note.isAccidental = function(note){
@@ -266,10 +269,8 @@ Note.toString = function(note, options){
 
 Note.toObject = function(note, options){
 	options = options || {};
-	var signature = Note.getSig(note, options);
+	// var signature = Note.getSig(note, options);
 	return {
-		letter: signature[0],
-		accidental: signature[1] || '',
 		chromatic: note.chromatic,
 		octave: note.octave,
 		duration: note.duration
