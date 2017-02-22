@@ -73,11 +73,14 @@ test('new note via string (with octaves)', function(t){
 test('new note via string (with durations)', function(t){
 	var note;
 
-	note = new Note('C.32');
+	note = new Note('C_32');
 	utils.assertNote(t, note, 'C', Note.DEFAULT_OCTAVE, 32, 'accepts a duration (short)');
 
-	note = new Note('C.1');
+	note = new Note('C_1');
 	utils.assertNote(t, note, 'C', Note.DEFAULT_OCTAVE, 1, 'accepts a duration (longest)');
+
+	note = new Note('C_1.5');
+	utils.assertNote(t, note, 'C', Note.DEFAULT_OCTAVE, 1.5, 'accepts a duration (fractional duration)');
 
 	//TODO: we don't currently allow notes longer than a whole note (e.g. double whole note)? we could notate them via .5 (if we update the regex in note.js)
 
@@ -86,8 +89,9 @@ test('new note via string (with durations)', function(t){
 	// 	note = new Note('C.128');
  //    }, 'throws if duration is too short');
 
+ 	//TODO: 0 length should be a ghost note!
 	t.throws(function(){
-		note = new Note('C.0');
+		note = new Note('C_0');
     }, 'throws if octave is too long');
 
 	t.end();
@@ -109,10 +113,10 @@ test('new note via string (with accidentals + octaves)', function(t){
 test('new note via string (with accidentals + durations)', function(t){
 	var note;
 
-	note = new Note('F#.8');
+	note = new Note('F#_8');
 	utils.assertNote(t, note, 'F#', Note.DEFAULT_OCTAVE, 8, 'accepts a sharp + duration');
 
-	note = new Note('Gb.2');
+	note = new Note('Gb_2');
 	utils.assertNote(t, note, 'F#', Note.DEFAULT_OCTAVE, 2, 'accepts a flat + duration');
 
 	t.end();
@@ -121,7 +125,7 @@ test('new note via string (with accidentals + durations)', function(t){
 test('new note via string (with octaves + durations)', function(t){
 	var note;
 
-	note = new Note('F9.16');
+	note = new Note('F9_16');
 	utils.assertNote(t, note, 'F', 9, 16, 'accepts an octave + duration');
 
 	t.end();
@@ -130,10 +134,10 @@ test('new note via string (with octaves + durations)', function(t){
 test('new note via string (with accidentals + octaves + durations)', function(t){
 	var note;
 
-	note = new Note('D#9.16');
+	note = new Note('D#9_16');
 	utils.assertNote(t, note, 'D#', 9, 16, 'accepts an octave + duration');
 
-	note = new Note('Db5.1');
+	note = new Note('Db5_1');
 	utils.assertNote(t, note, 'C#', 5, 1, 'accepts an octave + duration');
 
 	t.end();

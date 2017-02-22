@@ -23,7 +23,7 @@ function Note(arg1, options) {
 		if(object.chromatic){
 			object.letter = Note.SCALE_SHARPS[object.chromatic-1];
 		}
-		string = object.letter + object.accidental + object.octave + '.' + object.duration;
+		string = object.letter + object.accidental + object.octave + '_' + object.duration;
 	}
 	else if(type === 'string') {
 		string = arg1;
@@ -33,7 +33,7 @@ function Note(arg1, options) {
 	}
 
 	//<letter><accidental><octave>.<duration> (e.g. A#4.16, B.4, C8, Db5)
-	var regex = /^([A-Ga-g])([#b♯♭]*)(\d*)\.?(\d*)$/;
+	var regex = /^([A-Ga-g])([#b♯♭]*)(\d*)\_?(\d*(?:.\d)?)$/;
 	var array = regex.exec(string);
 	if(!array || array.length !== 5){
 		throw 'invalid note string format: ' + string;
@@ -136,6 +136,8 @@ Note.SCALE_SHARPS = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 Note.SCALE_FLATS = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
 Note.SCALE_LETTERS = ['C','D','E','F','G','A','B'];
 
+Note.DURATIONS = [1, 1.5, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128];
+
 Note.CHROMATIC_MAP = {
 	'C': 	1,
 	'C#': 	2,
@@ -186,6 +188,11 @@ Note.isAccidental = function(note){
 	return Note.getSig(note).length === 2;
 }
 
+// Note.isDotted = function(note){
+// 	//is it not a power of 2? (1, 2, 4, 8, 16, 32, etc.)
+// 	return !(note.duration & note.duration-1 === 0);
+// }
+
 //TODO: rename this method (what are Ab, C, D#, F## called?)
 Note.getSig = function(note, options) {
 	options = options || {};
@@ -234,29 +241,29 @@ Note.lower = function(note, options){
 //
 Note.shorten = function(note, options){
 	options = options || {};
-	var steps = options.steps || 1;
-	var wholeSteps = Math.floor(steps);
-	var halfStep = steps % 1 !== 0;
 
-	note.duration *= Math.pow(2, wholeSteps);
-	if(halfStep){
-		note.duration *= 1.5;
-	}
+	var steps = options.steps || 1;
+
+	var indexLimit = Note.DURATIONS.length - 1;
+	var currentIndex = Note.DURATIONS.indexOf(note.duration);
+	var newIndex = Math.min(currentIndex + steps, indexLimit);
+
+	note.duration = Note.DURATIONS[newIndex];
+
 	return note;
 }
 
 Note.lengthen = function(note, options){
 	options = options || {};
+
 	var steps = options.steps || 1;
-	var wholeSteps = Math.floor(steps);
-	var halfStep = steps % 1 !== 0;
-	note.duration /= Math.pow(2, wholeSteps);
-	if(halfStep){
-		note.duration = (note.duration / 2)*1.5;
-	}
-	if(note.duration < 1){
-		note.duration = 1;
-	}
+
+	var indexLimit = 0;
+	var currentIndex = Note.DURATIONS.indexOf(note.duration);
+	var newIndex = Math.max(currentIndex - steps, indexLimit);
+
+	note.duration = Note.DURATIONS[newIndex];
+
 	return note;
 }
 
@@ -264,7 +271,7 @@ Note.lengthen = function(note, options){
 //TO STRING, TO OBJECT
 //
 Note.toString = function(note, options){
-	return Note.getSig(note, options) + note.octave + '.' + note.duration;
+	return Note.getSig(note, options) + note.octave + '_' + note.duration;
 }
 
 Note.toObject = function(note, options){

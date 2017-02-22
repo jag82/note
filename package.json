@@ -1,6 +1,6 @@
 {
   "name": "@jag82/note",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "musical note as an object",
   "main": "note.js",
   "scripts": {

@@ -10,11 +10,11 @@ test('convert to string', function(t){
 	var note;
 
 	note = new Note('Ab');
-	t.equal(note.toString(), 'G#4.4');
-	t.equal(note.toString({ asFlat: true }), 'Ab4.4');
+	t.equal(note.toString(), 'G#4_4');
+	t.equal(note.toString({ asFlat: true }), 'Ab4_4');
 
-	note = new Note('Cb4.4');
-	t.equal(note.toString(), 'B4.4');
+	note = new Note('Cb4_4');
+	t.equal(note.toString(), 'B4_4');
 
 	t.end();
 });
